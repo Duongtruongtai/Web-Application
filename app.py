@@ -1,28 +1,21 @@
-from flask import Flask, render_template_string, request, jsonify, session, send_from_directory
+from flask import Flask, render_template_string, request, jsonify, session
 import json
 import os
 
 app = Flask(__name__)
 app.secret_key = 'toystore_secret_key_2026'
 
-# Cấu hình đường dẫn ảnh
-IMAGE_FOLDER = r'C:\Users\Tai\OneDrive\Máy tính\Web Application'
-
-@app.route('/images/<filename>')
-def get_image(filename):
-    """Phục vụ ảnh từ thư mục local"""
-    return send_from_directory(IMAGE_FOLDER, filename)
-
-# Danh sách sản phẩm với ẢNH LOCAL 100% - mỗi ảnh đúng với sản phẩm
+# Danh sách sản phẩm với ẢNH TỰ TẠO (dạng emoji + màu sắc)
 products = [
-    # LEGO & Xếp hình (dùng ảnh từ URL vì không có trong folder)
+    # LEGO & Xếp hình
     {
         "id": 1,
         "name": "LEGO Porsche 911 - Siêu xe thể thao",
         "price": 2490000,
         "old_price": 3290000,
-        "image": "https://www.lego.com/cdn/cs/set/assets/blt5d4c5e5c5e5c5e5c/42096.png",
-        "image_fallback": "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=600",
+        "image": "🚗",  # Emoji xe hơi
+        "color": "#FF6B6B",
+        "bg_color": "#FFE5E5",
         "category": "lego",
         "rating": 4.9,
         "sold": 245,
@@ -30,16 +23,16 @@ products = [
         "brand": "LEGO",
         "age": "10+",
         "material": "Nhựa ABS",
-        "in_stock": 45,
-        "color": "#FF6B8B"
+        "in_stock": 45
     },
     {
         "id": 2,
         "name": "LEGO Hogwarts - Lâu đài phép thuật",
         "price": 3990000,
         "old_price": 4590000,
-        "image": "https://www.lego.com/cdn/cs/set/assets/blt3d4c5e5c5e5c5e5c/71043.png",
-        "image_fallback": "https://images.unsplash.com/photo-1610484826967-09c5720778c7?w=600",
+        "image": "🏰",  # Emoji lâu đài
+        "color": "#9370DB",
+        "bg_color": "#F0E6FF",
         "category": "lego",
         "rating": 4.8,
         "sold": 89,
@@ -47,18 +40,18 @@ products = [
         "brand": "LEGO",
         "age": "12+",
         "material": "Nhựa ABS",
-        "in_stock": 12,
-        "color": "#9370DB"
+        "in_stock": 12
     },
     
-    # Thú nhồi bông - ẢNH TỪ FILE LOCAL CỦA BẠN
+    # Thú nhồi bông
     {
         "id": 3,
         "name": "Gấu Capybara Khổng Lồ 1.2m",
         "price": 550000,
         "old_price": 790000,
-        "image": "/images/download.jpg",
-        "image_fallback": "https://cf.shopee.vn/file/8a7f1d9c8c8c8c8c8c8c8c8c8c8c8c8c",
+        "image": "🦫",  # Emoji capybara
+        "color": "#F4A460",
+        "bg_color": "#FFF0E0",
         "category": "stuffed",
         "rating": 4.9,
         "sold": 528,
@@ -66,16 +59,16 @@ products = [
         "brand": "Dream Toys",
         "age": "0+",
         "material": "Lông nhung cao cấp",
-        "in_stock": 120,
-        "color": "#F4A460"
+        "in_stock": 120
     },
     {
         "id": 4,
         "name": "Gấu Teddy Nâu 50cm",
         "price": 299000,
         "old_price": 450000,
-        "image": "/images/download%20(1).jpg",
-        "image_fallback": "https://images.unsplash.com/photo-1568650358963-86c0d0c19c7e?w=600",
+        "image": "🧸",  # Emoji gấu bông
+        "color": "#8B4513",
+        "bg_color": "#FFE4C4",
         "category": "stuffed",
         "rating": 4.7,
         "sold": 892,
@@ -83,16 +76,16 @@ products = [
         "brand": "Teddy Bear",
         "age": "0+",
         "material": "Polyester cao cấp",
-        "in_stock": 200,
-        "color": "#8B4513"
+        "in_stock": 200
     },
     {
         "id": 5,
         "name": "Gấu Bông Panda 60cm",
         "price": 399000,
         "old_price": 590000,
-        "image": "/images/download%20(2).jpg",
-        "image_fallback": "https://images.unsplash.com/photo-1584992236006-bb63b3b161b5?w=600",
+        "image": "🐼",  # Emoji panda
+        "color": "#000000",
+        "bg_color": "#F0F0F0",
         "category": "stuffed",
         "rating": 4.8,
         "sold": 367,
@@ -100,8 +93,7 @@ products = [
         "brand": "Dream Toys",
         "age": "0+",
         "material": "Lông nhung",
-        "in_stock": 85,
-        "color": "#000000"
+        "in_stock": 85
     },
     
     # Xe điều khiển
@@ -110,8 +102,9 @@ products = [
         "name": "Hot Wheels Monster Truck RC",
         "price": 459000,
         "old_price": 650000,
-        "image": "https://product.hstatic.net/1000001234/product/monster_truck_rc_1.jpg",
-        "image_fallback": "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=600",
+        "image": "🚙",  # Emoji xe
+        "color": "#FF4500",
+        "bg_color": "#FFE0D0",
         "category": "rc",
         "rating": 4.8,
         "sold": 312,
@@ -119,8 +112,7 @@ products = [
         "brand": "Hot Wheels",
         "age": "6+",
         "material": "Nhựa ABS",
-        "in_stock": 56,
-        "color": "#FF4500"
+        "in_stock": 56
     },
     
     # Đồ chơi giáo dục
@@ -129,8 +121,9 @@ products = [
         "name": "Rubik 3x3 Speed Cube Pro",
         "price": 299000,
         "old_price": 450000,
-        "image": "https://product.hstatic.net/1000001234/product/rubik_3x3_1.jpg",
-        "image_fallback": "https://images.unsplash.com/photo-1591991564021-0662a8573199?w=600",
+        "image": "🧩",  # Emoji rubik
+        "color": "#32CD32",
+        "bg_color": "#E0FFE0",
         "category": "educational",
         "rating": 4.9,
         "sold": 567,
@@ -138,16 +131,16 @@ products = [
         "brand": "SpeedCube",
         "age": "6+",
         "material": "Nhựa ABS",
-        "in_stock": 150,
-        "color": "#32CD32"
+        "in_stock": 150
     },
     {
         "id": 8,
         "name": "Xếp Hình Gỗ 100 Chi Tiết",
         "price": 399000,
         "old_price": 550000,
-        "image": "/images/download%20(3).jpg",
-        "image_fallback": "https://images.unsplash.com/photo-1618365429382-9e8671b31006?w=600",
+        "image": "🪀",  # Emoji đồ chơi
+        "color": "#D2691E",
+        "bg_color": "#FFE8D0",
         "category": "educational",
         "rating": 4.8,
         "sold": 234,
@@ -155,8 +148,7 @@ products = [
         "brand": "Wooden Toys",
         "age": "3+",
         "material": "Gỗ tự nhiên",
-        "in_stock": 89,
-        "color": "#D2691E"
+        "in_stock": 89
     },
     
     # Búp bê
@@ -165,8 +157,9 @@ products = [
         "name": "Búp Bê Baby Annabell 43cm",
         "price": 1290000,
         "old_price": 1690000,
-        "image": "https://product.hstatic.net/1000001234/product/baby_annabell_1.jpg",
-        "image_fallback": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=600",
+        "image": "🎎",  # Emoji búp bê
+        "color": "#FFB6C1",
+        "bg_color": "#FFF0F5",
         "category": "dolls",
         "rating": 4.9,
         "sold": 145,
@@ -174,8 +167,7 @@ products = [
         "brand": "Baby Annabell",
         "age": "3+",
         "material": "Nhựa mềm + Vải",
-        "in_stock": 34,
-        "color": "#FFB6C1"
+        "in_stock": 34
     },
     
     # Đồ chơi nhập vai
@@ -184,8 +176,9 @@ products = [
         "name": "Bộ Đồ Chơi Bác Sĩ 32 Món",
         "price": 390000,
         "old_price": 590000,
-        "image": "/images/vn-11134207-7r98o-lt8aan5o12u15d.jpg",
-        "image_fallback": "https://images.unsplash.com/photo-1558863654-f5c11a5c369b?w=600",
+        "image": "🩺",  # Emoji ống nghe
+        "color": "#20B2AA",
+        "bg_color": "#E0FFFF",
         "category": "roleplay",
         "rating": 4.8,
         "sold": 403,
@@ -193,16 +186,16 @@ products = [
         "brand": "Doctor Play",
         "age": "3+",
         "material": "Nhựa ABS",
-        "in_stock": 67,
-        "color": "#20B2AA"
+        "in_stock": 67
     },
     {
         "id": 11,
         "name": "Bộ Nấu Ăn 25 Món",
         "price": 350000,
         "old_price": 520000,
-        "image": "https://product.hstatic.net/1000001234/product/kitchen_set_25_1.jpg",
-        "image_fallback": "https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=600",
+        "image": "🍳",  # Emoji nấu ăn
+        "color": "#FFA07A",
+        "bg_color": "#FFF0E0",
         "category": "roleplay",
         "rating": 4.7,
         "sold": 289,
@@ -210,8 +203,7 @@ products = [
         "brand": "Kitchen Fun",
         "age": "3+",
         "material": "Nhựa cao cấp",
-        "in_stock": 92,
-        "color": "#FFA07A"
+        "in_stock": 92
     },
     
     # Đồ chơi ngoài trời
@@ -220,8 +212,9 @@ products = [
         "name": "Xe Đạp Trẻ Em 16 inch",
         "price": 2590000,
         "old_price": 3290000,
-        "image": "/images/xe-dap-tre-em-nam-thong-nhat-batman-16-inch-1-700x467.jpg",
-        "image_fallback": "https://images.unsplash.com/photo-1576435778699-1a3e0008efb7?w=600",
+        "image": "🚲",  # Emoji xe đạp
+        "color": "#1E90FF",
+        "bg_color": "#E0F0FF",
         "category": "outdoor",
         "rating": 4.8,
         "sold": 67,
@@ -229,8 +222,7 @@ products = [
         "brand": "Kids Rider",
         "age": "4-7",
         "material": "Khung thép",
-        "in_stock": 15,
-        "color": "#1E90FF"
+        "in_stock": 15
     }
 ]
 
@@ -280,6 +272,8 @@ def add_to_cart():
         "name": product["name"],
         "price": product["price"],
         "image": product["image"],
+        "color": product["color"],
+        "bg_color": product["bg_color"],
         "quantity": quantity
     })
     session.modified = True
@@ -300,7 +294,7 @@ def category_view(category_id):
     cart_count = len(session.get('cart', []))
     return render_template_string(HOME_TEMPLATE, products=filtered, categories=categories, cart_count=cart_count, active_category=category_id)
 
-# HTML Template với giao diện đẹp
+# HTML Template với ẢNH TỰ TẠO (EMOJI + MÀU SẮC)
 HOME_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="vi">
@@ -342,6 +336,7 @@ HOME_TEMPLATE = """
             align-items: center;
             justify-content: space-between;
             gap: 30px;
+            flex-wrap: wrap;
         }
 
         .logo {
@@ -540,16 +535,18 @@ HOME_TEMPLATE = """
             box-shadow: 0 3px 8px rgba(255,107,107,0.3);
         }
 
-        .product-image {
+        .product-image-container {
             width: 100%;
             height: 250px;
-            object-fit: contain;
-            background: #f8f9fa;
-            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
             transition: transform 0.5s;
+            background: v-bind(product.bg_color);
         }
 
-        .product-card:hover .product-image {
+        .product-card:hover .product-image-container {
             transform: scale(1.05);
         }
 
@@ -720,7 +717,7 @@ HOME_TEMPLATE = """
     <div class="categories">
         <div class="container category-list">
             {% for cat in categories %}
-            <a href="/category/{{ cat.id }}" class="category-item {% if active_category == cat.id %}active{% endif %}">
+            <a href="/category/{{ cat.id }}" class="category-item {% if active_category == cat.id %}active{% endif %}" style="border-bottom: 3px solid {{ cat.color }};">
                 {{ cat.icon }} {{ cat.name }}
             </a>
             {% endfor %}
@@ -752,8 +749,9 @@ HOME_TEMPLATE = """
                 {% endif %}
                 
                 <a href="/product/{{ product.id }}">
-                    <img src="{{ product.image }}" alt="{{ product.name }}" class="product-image" 
-                         onerror="this.src='{{ product.image_fallback }}';this.onerror=null;">
+                    <div class="product-image-container" style="background: {{ product.bg_color }}; color: {{ product.color }};">
+                        {{ product.image }}
+                    </div>
                 </a>
                 
                 <div class="product-info">
@@ -911,6 +909,15 @@ PRODUCT_TEMPLATE = """
             font-size: 12px;
         }
         
+        .breadcrumb {
+            margin: 20px 0;
+        }
+        
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
         .product-detail {
             background: white;
             border-radius: 20px;
@@ -922,11 +929,15 @@ PRODUCT_TEMPLATE = """
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
         
-        .product-image {
+        .product-image-container {
             width: 100%;
             height: 500px;
-            object-fit: contain;
-            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 300px;
+            background: {{ product.bg_color }};
+            color: {{ product.color }};
             border-radius: 15px;
         }
         
@@ -939,6 +950,12 @@ PRODUCT_TEMPLATE = """
         .rating {
             color: #ffc107;
             margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .rating span {
+            color: #666;
+            margin-left: 10px;
         }
         
         .price-box {
@@ -967,6 +984,25 @@ PRODUCT_TEMPLATE = """
             margin-bottom: 30px;
         }
         
+        .product-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .meta-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .meta-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
         .add-to-cart {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -977,6 +1013,12 @@ PRODUCT_TEMPLATE = """
             font-weight: bold;
             cursor: pointer;
             width: 100%;
+            transition: 0.3s;
+        }
+        
+        .add-to-cart:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
         }
         
         .footer {
@@ -1002,9 +1044,14 @@ PRODUCT_TEMPLATE = """
     </div>
 
     <div class="container">
+        <div class="breadcrumb">
+            <a href="/">Trang chủ</a> / <span>{{ product.name }}</span>
+        </div>
+        
         <div class="product-detail">
-            <img src="{{ product.image }}" alt="{{ product.name }}" class="product-image"
-                 onerror="this.src='{{ product.image_fallback }}'">
+            <div class="product-image-container">
+                {{ product.image }}
+            </div>
             
             <div class="product-info">
                 <h1>{{ product.name }}</h1>
@@ -1019,7 +1066,7 @@ PRODUCT_TEMPLATE = """
                             <i class="far fa-star"></i>
                         {% endif %}
                     {% endfor %}
-                    <span style="color:#666"> ({{ product.rating }} sao - {{ product.sold }} đã bán)</span>
+                    <span>({{ product.rating }} sao - {{ product.sold }} đã bán)</span>
                 </div>
                 
                 <div class="price-box">
@@ -1031,10 +1078,25 @@ PRODUCT_TEMPLATE = """
                 
                 <div class="description">
                     <p>{{ product.description }}</p>
-                    <p style="margin-top:15px"><strong>Thương hiệu:</strong> {{ product.brand }}</p>
-                    <p><strong>Độ tuổi:</strong> {{ product.age }}</p>
-                    <p><strong>Chất liệu:</strong> {{ product.material }}</p>
-                    <p><strong>Còn hàng:</strong> {{ product.in_stock }} sản phẩm</p>
+                </div>
+                
+                <div class="product-meta">
+                    <div class="meta-item">
+                        <strong>Thương hiệu</strong>
+                        <p>{{ product.brand }}</p>
+                    </div>
+                    <div class="meta-item">
+                        <strong>Độ tuổi</strong>
+                        <p>{{ product.age }}</p>
+                    </div>
+                    <div class="meta-item">
+                        <strong>Chất liệu</strong>
+                        <p>{{ product.material }}</p>
+                    </div>
+                    <div class="meta-item">
+                        <strong>Còn hàng</strong>
+                        <p>{{ product.in_stock }} sản phẩm</p>
+                    </div>
                 </div>
                 
                 <button class="add-to-cart" onclick="addToCart({{ product.id }})">
@@ -1123,12 +1185,19 @@ CART_TEMPLATE = """
             gap: 20px;
             padding: 20px;
             border-bottom: 1px solid #eee;
+            align-items: center;
         }
         
-        .cart-item img {
+        .cart-item-image {
             width: 80px;
             height: 80px;
-            object-fit: contain;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            background: {{ item.bg_color if item.bg_color else '#f0f0f0' }};
+            color: {{ item.color if item.color else '#667eea' }};
+            border-radius: 10px;
         }
         
         .cart-summary {
@@ -1175,7 +1244,9 @@ CART_TEMPLATE = """
             <div class="cart-items">
                 {% for item in cart %}
                 <div class="cart-item">
-                    <img src="{{ item.image }}" onerror="this.src='https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=200'">
+                    <div class="cart-item-image">
+                        {{ item.image }}
+                    </div>
                     <div>
                         <h3>{{ item.name }}</h3>
                         <p>Số lượng: {{ item.quantity }}</p>
